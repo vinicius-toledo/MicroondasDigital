@@ -5,31 +5,33 @@ namespace MicroondasDigital.Models
 {
     public class MicroondasModel
     {
-     
-        private int _tempo;
-        private int _potencia;
-    
+        private const int PotenciaPadrao = 10;
         private const int TempoMaximo = 120;
         private const int TempoMinimo = 1;
-        private const int PotenciaPadrao = 10;
 
-        public string IniciarAquecimento(int segundos, int? potenciaInput)
+        public string Aquecer(int? segundos, int? potenciaInput)
         {
-            if (segundos < TempoMinimo || segundos > TempoMaximo)
-            {
+  
+            int tempo = (segundos == null || segundos == 0) ? 30 : segundos.Value;
+            int potencia = (potenciaInput == null || potenciaInput == 0) ? PotenciaPadrao : potenciaInput.Value;
+
+            if (tempo < TempoMinimo || tempo > TempoMaximo)
                 return "Erro: O tempo deve ser entre 1 e 120 segundos.";
-            }
 
-            _tempo = segundos;
-            _potencia = potenciaInput ?? PotenciaPadrao;
+            if (potencia < 1 || potencia > 10)
+                return "Erro: A potência deve ser entre 1 e 10.";
 
-            StringBuilder progresso = new StringBuilder();
-            for (int i = 0; i < _tempo; i++)
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < tempo; i++)
             {
-                progresso.Append(".");
+                for (int p = 0; p < potencia; p++)
+                {
+                    sb.Append(".");
+                }
+                sb.Append(" "); 
             }
 
-            return progresso.ToString() + " Aquecimento concluído";
+            return sb.ToString() + " Aquecimento concluído";
         }
     }
 }

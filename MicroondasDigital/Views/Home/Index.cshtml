@@ -3,31 +3,45 @@
 }
 
 <main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
+    <section class="row" style="margin-top: 30px;">
+       <div class="col-md-12">
+           <h2>Simulador de Micro-ondas</h2>
+           <p class="lead">Introduza o tempo e a potência para iniciar o aquecimento. </p>
+       </div>
     </section>
 
+    <hr />
+
     <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+        <div class=" col-md-6">
+            @using (Html.BeginForm("Iniciar", "Home", FormMethod.Post))
+            {
+                <div class="form-group">
+                    <label>Tempo (1 a 120 segundos): </label>
+                    <input type="number" name="segundos" class="form-control" placeholder="Vazio = 30 seg (Início Rapido)" />
+                </div>
+                <br />
+                <div class="form-group">
+                    <label>Potência (1 a 10): </label>
+                    <input type="number" name="potencia" class="form-control" placeholder="Padrão = 10 " />
+                </div>
+                <br />
+                <button type="submit" class="btn btn-primary">Iniciar Aquecimento</button>
+            }
+        </div>
+
+        <div class="col-md-6">
+            @if (ViewBag.Resultado != null)
+            {
+                <div class="card">
+                    <div class="card-header">Painel de Visualização</div>
+                    <div class="card-body">
+                        <div style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word">
+                            @ViewBag.Resultado
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </main>

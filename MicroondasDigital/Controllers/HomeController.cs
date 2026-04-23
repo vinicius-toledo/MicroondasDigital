@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using MicroondasDigital.Models;
 
 namespace MicroondasDigital.Controllers
 {
@@ -13,18 +10,19 @@ namespace MicroondasDigital.Controllers
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
 
-            return View();
+        [HttpPost]
+        public ActionResult Iniciar(int? segundos, int? potencia)
+        {
+            var microondas = new MicroondasModel();
+
+            string resultado = microondas.Aquecer(segundos, potencia);
+
+            ViewBag.Resultado = resultado;
+
+            return View("Index");
+
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
     }
 }
