@@ -18,12 +18,12 @@
             {
                 <div class="form-group">
                     <label>Tempo (1 a 120 segundos): </label>
-                    <input type="number" name="segundos" class="form-control" placeholder="Vazio = 30 seg (Início Rapido)" />
+                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg (Início Rapido)" />
                 </div>
                 <br />
                 <div class="form-group">
                     <label>Potência (1 a 10): </label>
-                    <input type="number" name="potencia" class="form-control" placeholder="Padrão = 10 " />
+                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" />
                 </div>
                 <br />
                 <button type="submit" class="btn btn-primary">Iniciar Aquecimento</button>
@@ -33,14 +33,22 @@
         <div class="col-md-6">
             @if (ViewBag.Resultado != null)
             {
-                <div class="card">
-                    <div class="card-header">Painel de Visualização</div>
-                    <div class="card-body">
-                        <div style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word">
+                <hr />
+                if (ViewBag.Resultado.StartsWith("Erro"))
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.Resultado
+                    </div>
+                }
+                else
+                {
+                    <div class="card">
+                        <div class="card-header">Painel de Visualização</div>
+                        <div class="card-body" style="background-color: #000; color:#0f0; font-family: monospace;">
                             @ViewBag.Resultado
                         </div>
                     </div>
-                </div>
+                }
             }
         </div>
     </div>

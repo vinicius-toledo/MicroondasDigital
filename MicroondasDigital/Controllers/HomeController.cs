@@ -16,8 +16,12 @@ namespace MicroondasDigital.Controllers
         {
             var microondas = new MicroondasModel();
 
+            int potenciaFinal = potencia ?? 10;
+
             string resultado = microondas.Aquecer(segundos, potencia);
 
+            ViewBag.Segundos = segundos;
+            ViewBag.Potencia = potenciaFinal;
             ViewBag.Resultado = resultado;
 
             return View("Index");
