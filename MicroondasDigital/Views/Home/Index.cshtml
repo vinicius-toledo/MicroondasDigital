@@ -1,24 +1,25 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Simulador de Micro-ondas - Nível 1";
 }
-
 <main>
     <section class="row" style="margin-top: 30px;">
-       <div class="col-md-12">
-           <h2>Simulador de Micro-ondas</h2>
-           <p class="lead">Introduza o tempo e a potência para iniciar o aquecimento. </p>
-       </div>
+        <div class="col-md-12">
+            <h2>Simulador de Micro-ondas</h2>
+            <p class="lead">Introduza o tempo e a potência para iniciar o aquecimento.</p>
+        </div>
     </section>
 
     <hr />
 
     <div class="row">
-        <div class=" col-md-6">
+        <div class="col-md-6">
             @using (Html.BeginForm("Iniciar", "Home", FormMethod.Post))
             {
+                <input type="hidden" name="tempoRestanteAtual" value="@ViewBag.TempoRestante" />
+
                 <div class="form-group">
                     <label>Tempo (1 a 120 segundos): </label>
-                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg (Início Rapido)" />
+                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg (Início Rápido)" />
                 </div>
                 <br />
                 <div class="form-group">
@@ -26,26 +27,45 @@
                     <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" />
                 </div>
                 <br />
-                <button type="submit" class="btn btn-primary">Iniciar Aquecimento</button>
+                <button type="submit" class="btn btn-success">
+                    @(ViewBag.Pausado == true ? "Retomar Aquecimento" : "Iniciar Aquecimento / +30s")
+                </button>
+            }
+
+            <br />
+
+            @using (Html.BeginForm("PausarCancelar", "Home", FormMethod.Post))
+            {
+                <input type="hidden" name="tempoRestante" value="@ViewBag.TempoRestante" />
+                <input type="hidden" name="jaPausado" value="@(ViewBag.Pausado == true ? "true" : "false")" />
+
+                <button type="submit" class="btn btn-danger">Pausar / Cancelar</button>
             }
         </div>
 
         <div class="col-md-6">
             @if (ViewBag.Resultado != null)
             {
-                <hr />
                 if (ViewBag.Resultado.StartsWith("Erro"))
                 {
                     <div class="alert alert-danger">
-                        @ViewBag.Resultado
+                        <strong>Atenção:</strong> @ViewBag.Resultado
                     </div>
                 }
                 else
                 {
                     <div class="card">
-                        <div class="card-header">Painel de Visualização</div>
-                        <div class="card-body" style="background-color: #000; color:#0f0; font-family: monospace;">
+                        <div class="card-header">Painel Digital</div>
+                        <div class="card-body" style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word;">
+
+                            <h3 style="color: #0f0; text-align: center; margin-bottom: 10px;">
+                                ⏱️ @ViewBag.TempoFormatado
+                            </h3>
+
+                            <hr style="border-color: #0f0; opacity: 0.5;" />
+
                             @ViewBag.Resultado
+
                         </div>
                     </div>
                 }
