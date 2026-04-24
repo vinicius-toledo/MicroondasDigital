@@ -1,30 +1,55 @@
 ﻿@{
-    ViewBag.Title = "Simulador de Micro-ondas - Nível 1";
+    ViewBag.Title = "Simulador de Micro-ondas";
 }
+
 <main>
     <section class="row" style="margin-top: 30px;">
         <div class="col-md-12">
             <h2>Simulador de Micro-ondas</h2>
-            <p class="lead">Introduza o tempo e a potência para iniciar o aquecimento.</p>
+            <p class="lead">Introduza o tempo e a potência ou escolha um programa rápido.</p>
         </div>
     </section>
 
     <hr />
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                @foreach (var p in new MicroondasDigital.Models.MicroondasModel().ProgramasPadrao)
+                {
+                    using (Html.BeginForm("IniciarPrograma", "Home", FormMethod.Post, new { style = "display:inline;" }))
+                    {
+                        <input type="hidden" name="nomePrograma" value="@p.Nome" />
+                        <button type="submit" class="btn btn-outline-info">@p.Nome</button>
+                    }
+                }
+            </div>
+
+            @if (ViewBag.Instrucao != null)
+            {
+                <div class="alert alert-info mt-3">
+                    <strong>@ViewBag.NomePrograma:</strong> @ViewBag.Instrucao
+                </div>
+            }
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-6">
             @using (Html.BeginForm("Iniciar", "Home", FormMethod.Post))
             {
                 <input type="hidden" name="tempoRestanteAtual" value="@ViewBag.TempoRestante" />
+                <input type="hidden" name="programaAtivo" value="@(ViewBag.ProgramaAtivo == true ? "true" : "false")" />
+                <input type="hidden" name="caractere" value="@(ViewBag.Caractere ?? '.')" />
 
                 <div class="form-group">
                     <label>Tempo (1 a 120 segundos): </label>
-                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg (Início Rápido)" />
+                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
                 </div>
                 <br />
                 <div class="form-group">
                     <label>Potência (1 a 10): </label>
-                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" />
+                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
                 </div>
                 <br />
                 <button type="submit" class="btn btn-success">

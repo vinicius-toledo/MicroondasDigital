@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using MicroondasDigital.Models;
 
 namespace MicroondasDigital.Controllers
@@ -11,20 +12,51 @@ namespace MicroondasDigital.Controllers
         }
 
         [HttpPost]
-        public ActionResult Iniciar(int? segundos, int? potencia, int? tempoRestanteAtual)
+        public ActionResult IniciarPrograma(string nomePrograma)
+        {
+            var microondas = new MicroondasModel();
+            var programa = microondas.ProgramasPadrao.FirstOrDefault(p => p.Nome == nomePrograma);
+
+            if (programa != null)
+            {
+                ViewBag.Segundos = programa.Tempo;
+                ViewBag.Potencia = programa.Potencia;
+                ViewBag.ProgramaAtivo = true;
+                ViewBag.Caractere = programa.Caractere;
+                ViewBag.Instrucao = programa.Instrucoes; 
+                ViewBag.NomePrograma = programa.Nome;
+
+                string resultado = microondas.Aquecer(programa.Tempo, programa.Potencia, 0, programa.Caractere, true);
+
+                ViewBag.Resultado = resultado;
+                ViewBag.TempoFormatado = microondas.FormatarTempo(programa.Tempo);
+                ViewBag.TempoRestante = programa.Tempo;
+            }
+            return View("Index");
+        }
+
+        [HttpPost]
+        public ActionResult Iniciar(int? segundos, int? potencia, int? tempoRestanteAtual, bool programaAtivo = false, char caractere = '.')
         {
             var microondas = new MicroondasModel();
 
             int tempoBase = (segundos == null || segundos == 0) ? 30 : segundos.Value;
             int tempoFinal = (tempoRestanteAtual ?? 0) > 0 ? (tempoRestanteAtual.Value + 30) : tempoBase;
 
-            string resultado = microondas.Aquecer(segundos, potencia, tempoRestanteAtual);
+            string resultado = microondas.Aquecer(segundos, potencia, tempoRestanteAtual, caractere, programaAtivo);
 
             ViewBag.Resultado = resultado;
-            ViewBag.TempoFormatado = microondas.FormatarTempo(tempoFinal); 
+            ViewBag.TempoFormatado = microondas.FormatarTempo(tempoFinal);
             ViewBag.Segundos = segundos;
             ViewBag.Potencia = potencia ?? 10;
-            ViewBag.TempoRestante = tempoFinal;
+
+            if (!resultado.StartsWith("Erro"))
+                ViewBag.TempoRestante = tempoFinal;
+            else
+                ViewBag.TempoRestante = tempoRestanteAtual;
+
+            ViewBag.ProgramaAtivo = programaAtivo;
+            ViewBag.Caractere = caractere;
 
             return View("Index");
         }
@@ -39,6 +71,7 @@ namespace MicroondasDigital.Controllers
                 ViewBag.Potencia = 10;
                 ViewBag.TempoRestante = 0;
                 ViewBag.Pausado = false;
+                ViewBag.ProgramaAtivo = false; 
             }
             else
             {

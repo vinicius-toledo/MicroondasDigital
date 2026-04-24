@@ -59,32 +59,34 @@ namespace MicroondasDigital.Models
                 )
         };
 
-        public string Aquecer(int? segundos, int? potenciaInput, int? tempoRestanteAtual = 0)
+        public string Aquecer(int? segundos, int? potenciaInput, int? tempoRestanteAtual = 0, char caractere = '.', bool isPrograma = false)
         {
-
-            if(tempoRestanteAtual >0)
+            if (tempoRestanteAtual > 0)
             {
+                if (isPrograma) return "Erro: Acréscimo de tempo não permitido para programas pré-definidos.";
+
                 int novoTempo = tempoRestanteAtual.Value + 30;
 
-                if(novoTempo > 120) 
+                if (novoTempo > 120)
                 {
-                  return "Erro: O tempo total não pode exceder 120 segundos.";
+                    return "Erro: O tempo total não pode exceder 120 segundos.";
                 }
 
-                return GerarStringAquecimento(novoTempo, potenciaInput ?? 10, '.');
-
+                return GerarStringAquecimento(novoTempo, potenciaInput ?? 10, caractere);
             }
-  
+
             int tempo = (segundos == null || segundos == 0) ? 30 : segundos.Value;
             int potencia = (potenciaInput == null || potenciaInput == 0) ? PotenciaPadrao : potenciaInput.Value;
 
-            if (tempo < TempoMinimo || tempo > TempoMaximo)
-                return "Erro: O tempo deve ser entre 1 e 120 segundos.";
+            if (!isPrograma)
+            {
+                if (tempo < TempoMinimo || tempo > TempoMaximo)
+                    return "Erro: O tempo deve ser entre 1 e 120 segundos.";
 
-            if (potencia < 1 || potencia > 10)
-                return "Erro: A potência deve ser entre 1 e 10.";
-
-            return GerarStringAquecimento(tempo, potencia, '.');
+                if (potencia < 1 || potencia > 10)
+                    return "Erro: A potência deve ser entre 1 e 10.";
+            }
+            return GerarStringAquecimento(tempo, potencia, caractere);
         }
 
         public string FormatarTempo(int segundos)
