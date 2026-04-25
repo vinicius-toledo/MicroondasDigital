@@ -15,7 +15,7 @@ namespace MicroondasDigital.Controllers
         public ActionResult IniciarPrograma(string nomePrograma)
         {
             var microondas = new MicroondasModel();
-            var programa = microondas.ProgramasPadrao.FirstOrDefault(p => p.Nome == nomePrograma);
+            var programa = microondas.ObterTodosOsProgramas().FirstOrDefault(p => p.Nome == nomePrograma);
 
             if (programa != null)
             {
@@ -23,7 +23,7 @@ namespace MicroondasDigital.Controllers
                 ViewBag.Potencia = programa.Potencia;
                 ViewBag.ProgramaAtivo = true;
                 ViewBag.Caractere = programa.Caractere;
-                ViewBag.Instrucao = programa.Instrucoes; 
+                ViewBag.Instrucao = programa.Instrucoes;
                 ViewBag.NomePrograma = programa.Nome;
 
                 string resultado = microondas.Aquecer(programa.Tempo, programa.Potencia, 0, programa.Caractere, true);
@@ -71,7 +71,7 @@ namespace MicroondasDigital.Controllers
                 ViewBag.Potencia = 10;
                 ViewBag.TempoRestante = 0;
                 ViewBag.Pausado = false;
-                ViewBag.ProgramaAtivo = false; 
+                ViewBag.ProgramaAtivo = false;
             }
             else
             {
@@ -79,6 +79,31 @@ namespace MicroondasDigital.Controllers
                 ViewBag.TempoRestante = tempoRestante;
                 ViewBag.Pausado = true;
             }
+
+            return View("Index");
+        }
+
+        [HttpPost]
+        public ActionResult CadastrarPrograma(string nome, string alimento, int tempo, int potencia, char caractere, string instrucoes)
+        {
+            var microondas = new MicroondasModel();
+
+            var novoPrograma = new ProgramaAquecimento(
+                nome: nome,
+                alimento: alimento,
+                tempo: tempo,
+                potencia: potencia,
+                caractere: caractere,
+                instrucoes: instrucoes ?? "",
+                alimentoCustomizado: true
+            );
+
+            string resultado = microondas.SalvarProgramaCUstomizado(novoPrograma);
+
+            if (resultado.StartsWith("Erro"))
+                ViewBag.ErroCadastro = resultado;
+            else
+                ViewBag.SucessoCadastro = resultado;
 
             return View("Index");
         }

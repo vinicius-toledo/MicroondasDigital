@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Newtonsoft.Json;
 
 namespace MicroondasDigital.Models
 {
@@ -17,7 +16,6 @@ namespace MicroondasDigital.Models
 
         public bool AlimentoCustomizado { get; private set; }
 
-        [JsonConstructor]
         public ProgramaAquecimento(string nome, string alimento, int tempo, int potencia, char caractere, string instrucoes, bool alimentoCustomizado = false)
         {
             Nome = nome;
