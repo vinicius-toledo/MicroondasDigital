@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace MicroondasDigital.Models
 {
@@ -58,6 +61,50 @@ namespace MicroondasDigital.Models
                 instrucoes:"Deixe o recipiente destampado e em casos de plástico, cuidado ao retirar o recipiente pois o mesmo pode perder resistência em altas temperaturas."
                 )
         };
+
+        private string CaminhoArquivoJson = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "programas_customizados.json");
+
+        public List<ProgramaAquecimento> ObterProgramasCustomizados()
+        {
+            if (!File.Exists(CaminhoArquivoJson))
+            {
+                return new List<ProgramaAquecimento>();
+            }
+
+            string json = File.ReadAllText(CaminhoArquivoJson);
+            return JsonConvert.DeserializeObject<List<ProgramaAquecimento>>(json) ?? new List<ProgramaAquecimento>();
+        }
+
+        public string SalvarProgramaCUstomizado(ProgramaAquecimento novoPrograma)
+        {
+            if(novoPrograma.Caractere == '.')
+                return "Erro: O caractere '.' é reservado para o aquecimento padrão e não pode ser utilizado em programas customizados.";
+
+
+            var todosProgramas = new List<ProgramaAquecimento>();
+            todosProgramas.AddRange(ProgramasPadrao);
+            todosProgramas.AddRange(ObterProgramasCustomizados());
+
+            if(todosProgramas.Any(p=> p.Caractere == novoPrograma.Caractere))
+                return $"Erro: O caractere '{novoPrograma.Caractere}' já está em uso por outro programa. Escolha um caractere diferente.";
+
+            var customizado = ObterProgramasCustomizados();
+            customizado.Add(novoPrograma);
+
+            string json = JsonConvert.SerializeObject(customizado);
+            File.WriteAllText(CaminhoArquivoJson, json);
+
+            return"Sucesso: Programa customizado salvo com sucesso."; 
+        }
+
+        public List<ProgramaAquecimento> ObterTodosOsProgramas()
+        {
+            var todos = new List<ProgramaAquecimento>();
+            todos.AddRange(ProgramasPadrao);
+            todos.AddRange(ObterProgramasCustomizados());
+            return todos;
+
+        }
 
         public string Aquecer(int? segundos, int? potenciaInput, int? tempoRestanteAtual = 0, char caractere = '.', bool isPrograma = false)
         {
