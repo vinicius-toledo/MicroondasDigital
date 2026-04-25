@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Simulador de Micro-ondas";
+    ViewBag.Title = "Simulador de Micro-ondas - Nível 3";
 }
 
 <main>
@@ -10,91 +10,143 @@
         </div>
     </section>
 
-    <hr />
-
     <div class="row mb-4">
         <div class="col-md-12">
             <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                @foreach (var p in new MicroondasDigital.Models.MicroondasModel().ProgramasPadrao)
-                {
-                    using (Html.BeginForm("IniciarPrograma", "Home", FormMethod.Post, new { style = "display:inline;" }))
+                <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                    @foreach (var p in new MicroondasDigital.Models.MicroondasModel().ObterTodosOsProgramas())
                     {
-                        <input type="hidden" name="nomePrograma" value="@p.Nome" />
-                        <button type="submit" class="btn btn-outline-info">@p.Nome</button>
+                        using (Html.BeginForm("IniciarPrograma", "Home", FormMethod.Post, new { style = "display:inline;" }))
+                        {
+                            <input type="hidden" name="nomePrograma" value="@p.Nome" />
+
+                            <button type="submit" class="btn btn-outline-info @(p.AlimentoCustomizado ? "fst-italic" : "")">
+                                @if (p.AlimentoCustomizado)
+                                {
+                                    <span style="font-style: italic !important;">@p.Nome</span>
+                                }
+                                else
+                                {
+                                    @p.Nome
+                                }
+                            </button>
+                        }
                     }
+                </div>
+
+                @if (ViewBag.Instrucao != null)
+                {
+                    <div class="alert alert-info mt-3">
+                        <strong>@ViewBag.NomePrograma:</strong> @ViewBag.Instrucao
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                @using (Html.BeginForm("Iniciar", "Home", FormMethod.Post))
+                {
+                    <input type="hidden" name="tempoRestanteAtual" value="@ViewBag.TempoRestante" />
+                    <input type="hidden" name="programaAtivo" value="@(ViewBag.ProgramaAtivo == true ? "true" : "false")" />
+                    <input type="hidden" name="caractere" value="@(ViewBag.Caractere ?? '.')" />
+
+                    <div class="form-group">
+                        <label>Tempo (1 a 120 segundos): </label>
+                        <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <label>Potência (1 a 10): </label>
+                        <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
+                    </div>
+                    <br />
+                    <button type="submit" class="btn btn-success">
+                        @(ViewBag.Pausado == true ? "Retomar Aquecimento" : "Iniciar Aquecimento / +30s")
+                    </button>
+                }
+                <br />
+                @using (Html.BeginForm("PausarCancelar", "Home", FormMethod.Post))
+                {
+                    <input type="hidden" name="tempoRestante" value="@ViewBag.TempoRestante" />
+                    <input type="hidden" name="jaPausado" value="@(ViewBag.Pausado == true ? "true" : "false")" />
+
+                    <button type="submit" class="btn btn-danger">Pausar / Cancelar</button>
                 }
             </div>
 
-            @if (ViewBag.Instrucao != null)
-            {
-                <div class="alert alert-info mt-3">
-                    <strong>@ViewBag.NomePrograma:</strong> @ViewBag.Instrucao
-                </div>
-            }
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            @using (Html.BeginForm("Iniciar", "Home", FormMethod.Post))
-            {
-                <input type="hidden" name="tempoRestanteAtual" value="@ViewBag.TempoRestante" />
-                <input type="hidden" name="programaAtivo" value="@(ViewBag.ProgramaAtivo == true ? "true" : "false")" />
-                <input type="hidden" name="caractere" value="@(ViewBag.Caractere ?? '.')" />
-
-                <div class="form-group">
-                    <label>Tempo (1 a 120 segundos): </label>
-                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
-                </div>
-                <br />
-                <div class="form-group">
-                    <label>Potência (1 a 10): </label>
-                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
-                </div>
-                <br />
-                <button type="submit" class="btn btn-success">
-                    @(ViewBag.Pausado == true ? "Retomar Aquecimento" : "Iniciar Aquecimento / +30s")
-                </button>
-            }
-
-            <br />
-
-            @using (Html.BeginForm("PausarCancelar", "Home", FormMethod.Post))
-            {
-                <input type="hidden" name="tempoRestante" value="@ViewBag.TempoRestante" />
-                <input type="hidden" name="jaPausado" value="@(ViewBag.Pausado == true ? "true" : "false")" />
-
-                <button type="submit" class="btn btn-danger">Pausar / Cancelar</button>
-            }
-        </div>
-
-        <div class="col-md-6">
-            @if (ViewBag.Resultado != null)
-            {
-                if (ViewBag.Resultado.StartsWith("Erro"))
+            <div class="col-md-6">
+                @if (ViewBag.Resultado != null)
                 {
-                    <div class="alert alert-danger">
-                        <strong>Atenção:</strong> @ViewBag.Resultado
-                    </div>
-                }
-                else
-                {
-                    <div class="card">
-                        <div class="card-header">Painel Digital</div>
-                        <div class="card-body" style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word;">
-
-                            <h3 style="color: #0f0; text-align: center; margin-bottom: 10px;">
-                                ⏱️ @ViewBag.TempoFormatado
-                            </h3>
-
-                            <hr style="border-color: #0f0; opacity: 0.5;" />
-
-                            @ViewBag.Resultado
-
+                    if (ViewBag.Resultado.StartsWith("Erro"))
+                    {
+                        <div class="alert alert-danger"><strong>Atenção:</strong> @ViewBag.Resultado</div>
+                    }
+                    else
+                    {
+                        <div class="card">
+                            <div class="card-header">Painel Digital</div>
+                            <div class="card-body" style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word;">
+                                <h3 style="color: #0f0; text-align: center; margin-bottom: 10px;">⏱️ @ViewBag.TempoFormatado</h3>
+                                <hr style="border-color: #0f0; opacity: 0.5;" />
+                                @ViewBag.Resultado
+                            </div>
                         </div>
-                    </div>
+                    }
                 }
-            }
+            </div>
         </div>
-    </div>
+
+        <hr style="margin-top: 40px; margin-bottom: 40px; border-top: 2px dashed #ccc;" />
+
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <h3>Cadastrar Novo Programa</h3>
+                <p class="text-muted">Crie sua própria receita. O caractere não pode se repetir!</p>
+
+                @if (ViewBag.ErroCadastro != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.ErroCadastro</div>
+                }
+                @if (ViewBag.SucessoCadastro != null)
+                {
+                    <div class="alert alert-success">@ViewBag.SucessoCadastro</div>
+                }
+
+                <div class="card p-4 bg-light">
+                    @using (Html.BeginForm("CadastrarPrograma", "Home", FormMethod.Post))
+                    {
+                        <div class="row">
+                            <div class="col-md-4 form-group mb-2">
+                                <label>Nome do Programa *</label>
+                                <input type="text" name="nome" class="form-control" required />
+                            </div>
+                            <div class="col-md-4 form-group mb-2">
+                                <label>Alimento *</label>
+                                <input type="text" name="alimento" class="form-control" required />
+                            </div>
+                            <div class="col-md-2 form-group mb-2">
+                                <label>Tempo (seg) *</label>
+                                <input type="number" name="tempo" class="form-control" required />
+                            </div>
+                            <div class="col-md-2 form-group mb-2">
+                                <label>Potência *</label>
+                                <input type="number" name="potencia" class="form-control" required min="1" max="10" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2 form-group mb-2">
+                                <label>Caractere *</label>
+                                <input type="text" name="caractere" class="form-control" required maxlength="1" placeholder="Ex: &" />
+                            </div>
+                            <div class="col-md-10 form-group mb-2">
+                                <label>Instruções (Opcional)</label>
+                                <input type="text" name="instrucoes" class="form-control" placeholder="Dicas de preparo..." />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Salvar Receita</button>
+                    }
+                </div>
+            </div>
+        </div>
 </main>
