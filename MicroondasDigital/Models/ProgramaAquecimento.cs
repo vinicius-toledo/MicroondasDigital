@@ -14,7 +14,9 @@ namespace MicroondasDigital.Models
         public char Caractere { get; private set; }
         public string Instrucoes { get; private set; }
 
-        public ProgramaAquecimento(string nome, string alimento, int tempo, int potencia, char caractere, string instrucoes)
+        public bool AlimentoCustomizado { get; private set; }
+
+        public ProgramaAquecimento(string nome, string alimento, int tempo, int potencia, char caractere, string instrucoes, bool alimentoCustomizado = false)
         {
             Nome = nome;
             Alimento = alimento;
@@ -22,6 +24,7 @@ namespace MicroondasDigital.Models
             Potencia = potencia;
             Caractere = caractere;
             Instrucoes = instrucoes;
+            AlimentoCustomizado = alimentoCustomizado;
         }
     }
 }
