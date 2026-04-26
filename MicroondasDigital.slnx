@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="MicroondasDigital.API/MicroondasDigital.API/MicroondasDigital.API.csproj" Id="de8833ae-c761-4640-af84-831f0ca56b5e" />
   <Project Path="MicroondasDigital/MicroondasDigital.csproj" Id="3df08ea2-eefd-4901-b5f5-df6e9c82afd5" />
 </Solution>
