@@ -1,0 +1,7 @@
+
+[27/04/2026 19:50:14] ------------------
+MENSAGEM: Erro: O caractere '.' é reservado para o aquecimento padrão e não pode ser utilizado em programas customizados.
+TIPO: NegocioException
+STACKTRACE:    em MicroondasDigital.API.Controllers.MicroondasController.CadastrarPrograma(ProgramaAquecimento programa) na C:\Users\pc\Dev\Benner\MicroondasDigital\MicroondasDigital.API\MicroondasDigital.API\Controllers\MicroondasController.cs:linha 51
+INNER: 
+------------------------------

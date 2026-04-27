@@ -233,7 +233,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\GerenciadorErros.cs" />
     <Compile Include="Models\LoginRequest.cs" />
+    <Compile Include="Models\NegocioException.cs" />
     <Compile Include="Models\SegurancaUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
