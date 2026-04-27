@@ -4,25 +4,23 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MicroondasDigital.API.Models; // Certifique-se que o SegurancaUtils está aqui
+using MicroondasDigital.API.Models; 
 
 namespace MicroondasDigital.API.Controllers
 {
     [RoutePrefix("api/auth")]
     public class AuthController : ApiController
     {
-        // Chave secreta para assinar o token (mantenha segura!)
+      
         private const string SecretKey = "Chave_Muito_Secreta_Para_O_Microondas_2026";
 
         [HttpPost]
         [Route("login")]
         public IHttpActionResult Login([FromBody] LoginRequest login)
         {
-            // Senha padrão para o teste (em um sistema real viria do banco)
-            // Aqui estamos simulando que a senha cadastrada é "admin123"
+            
             string senhaCadastradaHash = SegurancaUtils.HashSenha("admin123");
 
-            // Criptografa a senha que o usuário digitou para comparar (Requisito 4.e)
             string senhaDigitadaHash = SegurancaUtils.HashSenha(login.Senha);
 
             if (login.Usuario == "admin" && senhaDigitadaHash == senhaCadastradaHash)
@@ -53,11 +51,5 @@ namespace MicroondasDigital.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-    }
-
-    public class LoginRequest
-    {
-        public string Usuario { get; set; }
-        public string Senha { get; set; }
     }
 }
