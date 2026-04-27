@@ -1,34 +1,61 @@
 ﻿@{
     ViewBag.Title = "Simulador de Micro-ondas";
+    bool apiConectada = Session["Token"] != null;
 }
 
 <style>
     .btn-customizado {
         font-style: italic !important;
     }
+    .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
 </style>
 
 <main>
     <section class="row" style="margin-top: 30px;">
         <div class="col-md-12">
-            <h2>Simulador de Micro-ondas</h2>
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-microwave me-2" viewBox="0 0 16 16" style="vertical-align: middle; color: #0dcaf0;">
+                    <path d="M12.5 11a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m.5-3a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0m-5.5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2Z" />
+                    <path d="M1 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H1ZM0 4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V4Zm11 3a1 1 0 1 0 0 2h3a1 1 0 1 0 0-2h-3Z" />
+                </svg>
+                Simulador de Micro-ondas
+            </h2>
             <p class="lead">Introduza o tempo e a potência ou escolha um programa rápido.</p>
+
+            @if (!apiConectada)
+            {
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <strong>Atenção:</strong> Você precisa configurar a conexão com a API para habilitar as funções.
+                    <a href="@Url.Action("Index", "Configuracao")" class="alert-link">Ir para Configurações</a>.
+                </div>
+            }
         </div>
     </section>
 
     <div class="row mb-4">
         <div class="col-md-12">
             <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                @foreach (var p in new MicroondasDigital.Models.MicroondasModel().ObterTodosOsProgramas())
+                @if (ViewBag.Programas != null)
                 {
-                    using (Html.BeginForm("IniciarPrograma", "Home", FormMethod.Post, new { style = "display:inline;" }))
+                    foreach (var p in ViewBag.Programas)
                     {
-                        <input type="hidden" name="nomePrograma" value="@p.Nome" />
-                        <button type="submit"
-                                class="btn btn-outline-info @(p.AlimentoCustomizado ? "btn-customizado" : "")">
-                                @p.Nome
-                        </button>
+                        using (Html.BeginForm("IniciarPrograma", "Home", FormMethod.Post, new { style = "display:inline;" }))
+                        {
+                            <input type="hidden" name="nomePrograma" value="@p.Nome" />
+                            <button type="submit" @(!apiConectada ? "disabled" : "")
+                                    class="btn btn-outline-info @(p.AlimentoCustomizado ? "btn-customizado" : "")">
+                                <i class="fa-solid fa-utensils me-1"></i> @p.Nome <strong style="color:#ffc107; font-size:0.85em;">[@p.Caractere]</strong>
+                            </button>
+                        }
                     }
+                }
+                else
+                {
+                    <p class="text-danger">Não foi possível carregar os programas da API.</p>
                 }
             </div>
 
@@ -51,16 +78,24 @@
 
                 <div class="form-group">
                     <label>Tempo (1 a 120 segundos): </label>
-                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
+                    <input type="number" name="segundos" class="form-control" value="@ViewBag.Segundos" placeholder="Vazio = 30 seg" @(ViewBag.ProgramaAtivo == true || !apiConectada ? "readonly" : "") />
                 </div>
                 <br />
                 <div class="form-group">
                     <label>Potência (1 a 10): </label>
-                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" @(ViewBag.ProgramaAtivo == true ? "readonly" : "") />
+                    <input type="number" name="potencia" class="form-control" value="@(ViewBag.Potencia ?? 10)" @(ViewBag.ProgramaAtivo == true || !apiConectada ? "readonly" : "") />
                 </div>
                 <br />
-                <button type="submit" class="btn btn-success">
-                    @(ViewBag.Pausado == true ? "Retomar Aquecimento" : "Iniciar Aquecimento / +30s")
+
+                <button type="submit" class="btn btn-success" @(!apiConectada ? "disabled" : "")>
+                    @if (ViewBag.Pausado == true)
+                    {
+                        <i class="fa-solid fa-play me-1"></i> @:Retomar Aquecimento
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-play me-1"></i> @:Iniciar Aquecimento / +30s
+                    }
                 </button>
             }
 
@@ -71,7 +106,9 @@
                 <input type="hidden" name="tempoRestante" value="@ViewBag.TempoRestante" />
                 <input type="hidden" name="jaPausado" value="@(ViewBag.Pausado == true ? "true" : "false")" />
 
-                <button type="submit" class="btn btn-danger">Pausar / Cancelar</button>
+                <button type="submit" class="btn btn-danger" @(!apiConectada ? "disabled" : "")>
+                    <i class="fa-solid fa-pause me-1"></i> Pausar / Cancelar
+                </button>
             }
         </div>
 
@@ -90,7 +127,7 @@
                         <div class="card-header">Painel Digital</div>
                         <div class="card-body" style="background-color: #000; color:#0f0; padding: 20px; font-family: 'Courier New', monospace; min-height:100px; word-wrap: break-word;">
                             <h3 style="color: #0f0; text-align: center; margin-bottom: 10px;">
-                                ⏱️ @ViewBag.TempoFormatado
+                                <i class="fa-solid fa-stopwatch"></i> @ViewBag.TempoFormatado
                             </h3>
                             <hr style="border-color: #0f0; opacity: 0.5;" />
                             @ViewBag.Resultado
@@ -123,35 +160,36 @@
                     <div class="row">
                         <div class="col-md-4 form-group mb-2">
                             <label>Nome do Programa *</label>
-                            <input type="text" name="nome" class="form-control" required />
+                            <input type="text" name="nome" class="form-control" required @(!apiConectada ? "disabled" : "") />
                         </div>
                         <div class="col-md-4 form-group mb-2">
                             <label>Alimento *</label>
-                            <input type="text" name="alimento" class="form-control" required />
+                            <input type="text" name="alimento" class="form-control" required @(!apiConectada ? "disabled" : "") />
                         </div>
                         <div class="col-md-2 form-group mb-2">
                             <label>Tempo (seg) *</label>
-                            <input type="number" name="tempo" class="form-control" required />
+                            <input type="number" name="tempo" class="form-control" required @(!apiConectada ? "disabled" : "") />
                         </div>
                         <div class="col-md-2 form-group mb-2">
                             <label>Potência *</label>
-                            <input type="number" name="potencia" class="form-control" required min="1" max="10" />
+                            <input type="number" name="potencia" class="form-control" required min="1" max="10" @(!apiConectada ? "disabled" : "") />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-2 form-group mb-2">
                             <label>Caractere *</label>
-                            <input type="text" name="caractere" class="form-control" required maxlength="1" placeholder="Ex: &amp;" />
+                            <input type="text" name="caractere" class="form-control" required maxlength="1" placeholder="Ex: &amp;" @(!apiConectada ? "disabled" : "") />
                         </div>
                         <div class="col-md-10 form-group mb-2">
                             <label>Instruções (Opcional)</label>
-                            <input type="text" name="instrucoes" class="form-control" placeholder="Dicas de preparo..." />
+                            <input type="text" name="instrucoes" class="form-control" placeholder="Dicas de preparo..." @(!apiConectada ? "disabled" : "") />
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Salvar Receita</button>
+                    <button type="submit" class="btn btn-primary mt-3" @(!apiConectada ? "disabled" : "")>
+                        <i class="fa-solid fa-floppy-disk me-1"></i> Salvar Receita
+                    </button>
                 }
             </div>
         </div>
     </div>
-
 </main>

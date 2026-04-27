@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Newtonsoft.Json; 
+using Newtonsoft.Json;
 
 namespace MicroondasDigital.Controllers
 {
@@ -11,9 +11,10 @@ namespace MicroondasDigital.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.UrlApi = Session["UrlApi"] ?? "https://localhost:44357/"; 
+            ViewBag.UrlApi = Session["UrlApi"] ?? "https://localhost:44385/";
             ViewBag.Usuario = Session["Usuario"];
-            ViewBag.StatusConexao = Session["Token"] != null ? "Conectado 🟢" : "Desconectado 🔴";
+
+            ViewBag.EstaConectado = Session["Token"] != null;
 
             return View();
         }
@@ -40,7 +41,7 @@ namespace MicroondasDigital.Controllers
                         Session["UrlApi"] = urlApi;
                         Session["Usuario"] = usuario;
 
-                        TempData["MensagemSucesso"] = "Conexão com a API estabelecida com sucesso!";
+                        return RedirectToAction("Index", "Home");
                     }
                     else
                     {

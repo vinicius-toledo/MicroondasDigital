@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "Login";
+}
+
+<div class="container mt-4">
+    <h2>Configuração de Conexão</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            @if (TempData["MensagemSucesso"] != null)
+            {
+                <div class="alert alert-success">@TempData["MensagemSucesso"]</div>
+            }
+            @if (TempData["MensagemErro"] != null)
+            {
+                <div class="alert alert-danger">@TempData["MensagemErro"]</div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Status:
+                        @if (ViewBag.EstaConectado != null && ViewBag.EstaConectado)
+                        {
+                            <span style="color: green; font-weight: bold;">
+                                Conectado <i class="fa-solid fa-check"></i>
+                            </span>
+                        }
+                        else
+                        {
+                            <span style="color: red; font-weight: bold;">
+                                Desconectado <i class="fa-solid fa-xmark"></i>
+                            </span>
+                        }
+                    </h5>
+
+                    @using (Html.BeginForm("SalvarConfiguracao", "Configuracao", FormMethod.Post))
+                    {
+                        <div class="form-group mb-3">
+                            <label>URL da API:</label>
+                            <input type="text" name="urlApi" class="form-control" value="@ViewBag.UrlApi" placeholder="ex: https://localhost:44300/" required />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Usuário:</label>
+                            <input type="text" name="usuario" class="form-control" value="@ViewBag.Usuario" required />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Senha:</label>
+                            <input type="password" name="senha" class="form-control" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Conectar e Salvar</button>
+                        <a href="@Url.Action("Deslogar", "Configuracao")" class="btn btn-outline-danger">Desconectar</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
